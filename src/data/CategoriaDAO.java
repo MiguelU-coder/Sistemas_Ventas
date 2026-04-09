@@ -32,6 +32,7 @@ public class CategoriaDAO implements CrudSimpleInterface<Categoria> {
             while (rs.next()){
                 registros.add(new Categoria(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getBoolean(4)));
                 System.out.println("A new Category was created");
+                System.out.println("COMMIT");
 
             }
         } catch (SQLException e) {

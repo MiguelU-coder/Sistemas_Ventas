@@ -5,6 +5,7 @@
 package data.interfaces;
 
 import java.util.List;
+//COmmit
 
 public interface CrudSimpleInterface<T> {
    public List<T> listar(String texto);
