@@ -11,8 +11,12 @@ import javax.swing.JOptionPane;
 /**
  *
  * @author MiguelAngelMolinaPue
+ *
+ * This class is encharged of
+ * connecting the code to the database
+ *
  */
-public class conexion {
+public class Conexion {
    private final String DRIVER = "com.mysql.cj.jdbc.Driver";
    private final String URL = "jdbc:mysql://localhost:3308/";
    private final String DB = "dbsistema";
@@ -21,10 +25,10 @@ public class conexion {
    
    public Connection cadena;
    
-   private conexion(){
+   private Conexion(){
        this.cadena = null;
    }
-   public static conexion instancia;
+   public static Conexion instancia;
 
 
    public Connection conectar(){
@@ -44,9 +48,9 @@ public class conexion {
            JOptionPane.showMessageDialog(null, e.getMessage());
        }
    }
-   public synchronized static conexion getInstancia(){
+   public synchronized static Conexion getInstancia(){
        if (instancia == null){
-           instancia=new conexion();
+           instancia=new Conexion();
        }
        return instancia;
    }
