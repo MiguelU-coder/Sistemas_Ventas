@@ -21,10 +21,12 @@ public class conexion {
    
    public Connection cadena;
    
-   public conexion(){
+   private conexion(){
        this.cadena = null;
    }
-   
+   public static conexion instancia;
+
+
    public Connection conectar(){
        try {
            Class.forName(DRIVER);
@@ -41,5 +43,11 @@ public class conexion {
        } catch (SQLException e) {
            JOptionPane.showMessageDialog(null, e.getMessage());
        }
+   }
+   public synchronized static conexion getInstancia(){
+       if (instancia == null){
+           instancia=new conexion();
+       }
+       return instancia;
    }
 }
