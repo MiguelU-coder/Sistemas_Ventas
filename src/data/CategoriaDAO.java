@@ -119,7 +119,7 @@ public class CategoriaDAO implements CrudSimpleInterface<Categoria> {
                 resp = true;
             }
             ps.close();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         } finally {
             ps = null;
