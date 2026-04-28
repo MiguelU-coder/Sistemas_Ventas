@@ -19,38 +19,54 @@ import javax.swing.JOptionPane;
 public class Conexion {
    private final String DRIVER = "com.mysql.cj.jdbc.Driver";
    private final String URL = "jdbc:mysql://localhost:3308/";
-   private final String DB = "dbsistema";
+   private final String DB = "sistemaventas";
    private final String USER = "root";
-   private final String PASSWORD = "1234";
-   
-   public Connection cadena;
-   
+   private final String PASSWORD = "";
+
+   private Connection cadena;
+   private static Conexion instancia;
+
    private Conexion(){
-       this.cadena = null;
+       conectar();
    }
-   public static Conexion instancia;
 
+    private void conectar(){
+        try {
+            Class.forName(DRIVER);
+            this.cadena = DriverManager.getConnection(URL + DB, USER, PASSWORD);
+            System.out.println("   Conexión exitosa a la base de datos");
+        } catch (ClassNotFoundException | SQLException e) {
+            System.err.println("   ERROR DE CONEXIÓN:");
+            System.err.println("   Driver: " + DRIVER);
+            System.err.println("   URL: " + URL + DB);
+            System.err.println("   Usuario: " + USER);
+            System.err.println("   Mensaje: " + e.getMessage());
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error de conexión: " + e.getMessage());
+            this.cadena = null;
+        }
+    }
 
-   public Connection conectar(){
-       try {
-           Class.forName(DRIVER);
-           this.cadena = DriverManager.getConnection(URL+DB,USER,PASSWORD);
-       } catch (ClassNotFoundException | SQLException e) {
-           JOptionPane.showMessageDialog(null, e.getMessage());
-       }
-       return this.cadena;
-   }
-   
-   public void desconectar(){
-       try {
-           this.cadena.close();
-       } catch (SQLException e) {
-           JOptionPane.showMessageDialog(null, e.getMessage());
-       }
-   }
-   public synchronized static Conexion getInstancia(){
+    public Connection obtenerConexion(){
+        if (this.cadena == null) {
+            JOptionPane.showMessageDialog(null, "No hay conexión a la base de datos");
+        }
+        return this.cadena;
+    }
+
+    public void desconectar(){
+        try {
+            if (this.cadena != null && !this.cadena.isClosed()) {
+                this.cadena.close();
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+    }
+
+   public static Conexion getInstancia(){
        if (instancia == null){
-           instancia=new Conexion();
+           instancia = new Conexion();
        }
        return instancia;
    }

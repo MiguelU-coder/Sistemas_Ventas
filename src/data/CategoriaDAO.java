@@ -25,27 +25,20 @@ public class CategoriaDAO implements CrudSimpleInterface<Categoria> {
         List<Categoria> registros = new ArrayList();
 
         try {
-            ps = CON.conectar().prepareStatement("SELECT * FROM categoria WHERE nombre LIKE ? ", ResultSet.TYPE_SCROLL_SENSITIVE, 
+            ps = CON.obtenerConexion().prepareStatement("SELECT * FROM categoria WHERE nombre LIKE ? ", ResultSet.TYPE_SCROLL_SENSITIVE,
                         ResultSet.CONCUR_UPDATABLE);
             ps.setString(1,"%" + texto + "%");
             rs = ps.executeQuery();
 
             while (rs.next()){
                 registros.add(new Categoria(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getBoolean(4)));
-                System.out.println("A new Category was created");
-                System.out.println("COMMIT");
-
             }
-            
+
             ps.close();
             rs.close();
-            
+
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
-        } finally {
-            ps = null;
-            rs = null;
-            CON.desconectar();
         }
         return registros;
     }
@@ -54,18 +47,18 @@ public class CategoriaDAO implements CrudSimpleInterface<Categoria> {
     public boolean insertar(Categoria obj) {
         resp = false;
         try {
-            ps = CON.conectar().prepareStatement("INSERT INTO categoria (nombre, descripcion ,activo ) VALUES (?,?,1)");
-            ps.setString(2,obj.getNombre());
-            ps.setString(1, obj.getDescripcion());
+            ps = CON.obtenerConexion().prepareStatement("INSERT INTO categoria (nombre, descripcion, activo) VALUES (?,?,1)");
+            ps.setString(1, obj.getNombre());
+            ps.setString(2, obj.getDescripcion());
             if (ps.executeUpdate() > 0) {
                 resp = true;
             }
             ps.close();
         } catch (SQLException e) {
+            System.err.println("ERROR AL INSERTAR CATEGORÍA:");
+            System.err.println("Mensaje: " + e.getMessage());
+            e.printStackTrace();
             JOptionPane.showMessageDialog(null, e.getMessage());
-        } finally {
-            ps = null;
-            CON.desconectar();
         }
         return resp;
     }
@@ -74,9 +67,9 @@ public class CategoriaDAO implements CrudSimpleInterface<Categoria> {
     public boolean actualizar(Categoria obj) {
         resp = false;
         try {
-            ps = CON.conectar().prepareStatement("UPDATE categoria SET nombre =?, descripcion=?, id =?");
-            ps.setString(2,obj.getNombre());
-            ps.setString(1, obj.getDescripcion());
+            ps = CON.obtenerConexion().prepareStatement("UPDATE categoria SET nombre =?, descripcion=? WHERE id =?");
+            ps.setString(1, obj.getNombre());
+            ps.setString(2, obj.getDescripcion());
             ps.setInt(3, obj.getId());
             if (ps.executeUpdate() > 0) {
                 resp = true;
@@ -84,9 +77,6 @@ public class CategoriaDAO implements CrudSimpleInterface<Categoria> {
             ps.close();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
-        } finally {
-            ps = null;
-            CON.desconectar();
         }
         return resp;
     }
@@ -95,57 +85,47 @@ public class CategoriaDAO implements CrudSimpleInterface<Categoria> {
     public boolean desactivar(int id) {
         resp = false;
         try {
-            ps = CON.conectar().prepareStatement("UPDATE categoria SET activo=0, WHERE id =?");
-            ps.setInt(1 ,id);
+            ps = CON.obtenerConexion().prepareStatement("UPDATE categoria SET activo=0 WHERE id =?");
+            ps.setInt(1, id);
             if (ps.executeUpdate() > 0) {
                 resp = true;
             }
             ps.close();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
-        } finally {
-            ps = null;
-            CON.desconectar();
         }
         return resp;
     }
-    
+
     @Override
     public boolean activar(int id) {
         resp = false;
         try {
-            ps = CON.conectar().prepareStatement("UPDATE categoria SET activo=1, WHERE id =?");
-            ps.setInt(1 ,id);
+            ps = CON.obtenerConexion().prepareStatement("UPDATE categoria SET activo=1 WHERE id =?");
+            ps.setInt(1, id);
             if (ps.executeUpdate() > 0) {
                 resp = true;
             }
             ps.close();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
-        } finally {
-            ps = null;
-            CON.desconectar();
         }
         return resp;
     }
     
     @Override
     public int total() {
-        int totalRegistros=0;
+        int totalRegistros = 0;
         try {
-            ps = CON.conectar().prepareStatement("SELECT COUNT(id) categoria ");
-            rs= ps.executeQuery();
-            while (rs.next()) {                
-                totalRegistros = rs.getInt("COUNT(id)");
+            ps = CON.obtenerConexion().prepareStatement("SELECT COUNT(id) FROM categoria");
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                totalRegistros = rs.getInt(1);
             }
             ps.close();
             rs.close();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
-        } finally {
-            ps = null;
-            rs = null;
-            CON.desconectar();
         }
         return totalRegistros;
     }
@@ -154,22 +134,16 @@ public class CategoriaDAO implements CrudSimpleInterface<Categoria> {
     public boolean existe(String texto) {
         resp = false;
         try {
-            ps = CON.conectar().prepareStatement("SELECT nombre FROM categoria WHERE nombre=?");
-            ps.setString(1,texto);
+            ps = CON.obtenerConexion().prepareStatement("SELECT nombre FROM categoria WHERE nombre=?");
+            ps.setString(1, texto);
             rs = ps.executeQuery();
-            rs.last();
-            
-            if (rs.getRow() > 0) {
+            if (rs.next()) {
                 resp = true;
             }
             ps.close();
             rs.close();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
-        } finally {
-            ps = null;
-            rs = null;
-            CON.desconectar();
         }
         return resp;
     }
